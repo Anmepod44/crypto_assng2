@@ -22,7 +22,6 @@ def read_input_file(file_path):
 
 # Function to decrypt AES CBC with PKCS7 padding
 def decrypt_aes_cbc(key_hex, ciphertext_hex):
-    # Decode the hex-encoded key and ciphertext
     key = binascii.unhexlify(key_hex)
     ciphertext = binascii.unhexlify(ciphertext_hex)
     
