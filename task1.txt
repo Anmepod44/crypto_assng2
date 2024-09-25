@@ -1,0 +1,72 @@
+from Crypto.Cipher import AES
+from Crypto.Random import get_random_bytes
+from Crypto.Util.Padding import pad, unpad
+import os
+
+# BASE variable to ensure compatibility across different OS
+BASE = os.path.dirname(os.path.abspath(__file__))
+INPUT_FILE = os.path.join(BASE, "task1.txt")
+ENCRYPTED_FILE = os.path.join(BASE, "encrypted_task1.txt")
+DECRYPTED_FILE = os.path.join(BASE, "decrypted_task1.txt")
+
+# AES CBC mode requires key (secret) and initialization vector (iv)
+KEY_SIZE = 16  # AES-128, key size is 16 bytes (128 bits)
+BLOCK_SIZE = 16  # AES block size for CBC mode
+
+def encrypt_file(file_path, key):
+    # Read the content of the file
+    with open(file_path, 'rb') as file:
+        plaintext = file.read()
+
+    # Generate a random Initialization Vector (IV)
+    iv = get_random_bytes(BLOCK_SIZE)
+
+    # Create AES cipher object in CBC mode
+    cipher = AES.new(key, AES.MODE_CBC, iv)
+
+    # Pad the plaintext to be a multiple of BLOCK_SIZE
+    padded_plaintext = pad(plaintext, BLOCK_SIZE)
+
+    # Encrypt the plaintext
+    ciphertext = cipher.encrypt(padded_plaintext)
+
+    # Return IV and ciphertext
+    return iv + ciphertext
+
+def decrypt_file(ciphertext, key):
+    # Extract IV from the first BLOCK_SIZE bytes
+    iv = ciphertext[:BLOCK_SIZE]
+    ciphertext = ciphertext[BLOCK_SIZE:]
+
+    # Create AES cipher object for decryption in CBC mode
+    cipher = AES.new(key, AES.MODE_CBC, iv)
+
+    # Decrypt and then unpad the plaintext
+    padded_plaintext = cipher.decrypt(ciphertext)
+    plaintext = unpad(padded_plaintext, BLOCK_SIZE)
+
+    return plaintext
+
+def main():
+    # Step 1: Generate a random AES key
+    key = get_random_bytes(KEY_SIZE)
+    print(f"Generated AES Key: {key.hex()}")
+
+    # Step 2: Encrypt the content of 'task1.txt'
+    encrypted_content = encrypt_file(INPUT_FILE, key)
+    print(f"Encrypted content: {encrypted_content.hex()}")
+
+    # Save the encrypted content to a file (optional)
+    with open(ENCRYPTED_FILE, 'wb') as enc_file:
+        enc_file.write(encrypted_content)
+
+    # Step 3: Decrypt the content back
+    decrypted_content = decrypt_file(encrypted_content, key)
+    print(f"Decrypted content: {decrypted_content.decode('utf-8')}")
+
+    # Save the decrypted content to a separate file
+    with open(DECRYPTED_FILE, 'wb') as dec_file:
+        dec_file.write(decrypted_content)
+
+if __name__ == "__main__":
+    main()
