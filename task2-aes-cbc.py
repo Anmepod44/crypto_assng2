@@ -16,9 +16,26 @@ output_file_path = os.path.join(BASE, 'outputs/decrypted_output.txt')
 def read_input_file(file_path):
     with open(file_path, 'r') as file:
         lines = file.readlines()
-        # Extract key and ciphertext, stripping out labels and extra spaces
-        key_hex = lines[0].split(":")[1].strip()
-        ciphertext_hex = lines[2].strip()  # Ciphertext is on line 3
+
+        # Ensure we have enough lines to parse
+        if len(lines) < 2:
+            raise ValueError("The input file does not contain the expected number of lines.")
+        
+        # Extract the key, ensuring it's valid
+        try:
+            key_hex = lines[0].split(":")[1].strip()
+        except IndexError:
+            raise ValueError("Could not parse the AES key from the input file.")
+        
+        # Extract the ciphertext, ensuring it's valid
+        try:
+            ciphertext_hex = lines[1].split(":")[1].strip()
+        except IndexError:
+            raise ValueError("Could not parse the AES ciphertext from the input file.")
+        
+        # Remove any spaces or newlines from the ciphertext
+        ciphertext_hex = ciphertext_hex.replace(" ", "").replace("\n", "")
+    
     return key_hex, ciphertext_hex
 
 # Function to decrypt AES CBC with PKCS7 padding
