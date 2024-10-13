@@ -10,10 +10,10 @@ from Crypto.Random import get_random_bytes
 base_directory = os.path.dirname(os.path.abspath(__file__))
 
 # File paths
-plaintext_file_path = os.path.join(base_directory, 'task3.txt')
-ciphertext_file_path = os.path.join(base_directory, 'ciphertext.txt')
-decrypted_file_path = os.path.join(base_directory, 'decrypted_output.txt')
-signature_file_path = os.path.join(base_directory, 'signature.txt')
+plaintext_file_path = os.path.join(base_directory, 'inputs/task3.txt')
+ciphertext_file_path = os.path.join(base_directory, 'outputs/ciphertext.txt')
+decrypted_file_path = os.path.join(base_directory, 'outputs/decrypted_output.txt')
+signature_file_path = os.path.join(base_directory, 'outputs/signature.txt')
 
 # Function to generate RSA keys and save them to files
 def generate_rsa_keys(key_size, key_name):

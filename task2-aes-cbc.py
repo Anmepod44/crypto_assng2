@@ -1,69 +1,69 @@
 import os
+import binascii
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import unpad
-import binascii
 
-# Base directory for project files (adjusted dynamically for different OS)
-base_directory = os.path.dirname(os.path.abspath(__file__))
+# Define the base directory for the project
+BASE = os.path.dirname(os.path.abspath(__file__))
 
-# Path to the file that contains the AES key and ciphertext
-input_file_path = os.path.join(base_directory, 'task2.txt')
+# Path to the input file containing the AES key and ciphertext
+input_file_path = os.path.join(BASE, 'inputs/task2.txt')
 
-# Path where the decrypted plaintext will be saved
-output_file_path = os.path.join(base_directory, 'decrypted_output.txt')
+# Output file path for storing the decrypted plaintext
+output_file_path = os.path.join(BASE, 'outputs/decrypted_output.txt')
 
-# Function to read the AES key and ciphertext from the input file
+# Function to read the key and ciphertext from the input file
 def read_input_file(file_path):
     with open(file_path, 'r') as file:
-        # Read the AES key and ciphertext from the file (key and ciphertext in hex format)
-        key_in_hex = file.readline().strip()
-        ciphertext_in_hex = file.readline().strip()
-    return key_in_hex, ciphertext_in_hex
+        lines = file.readlines()
+        # Extract key and ciphertext, stripping out labels and extra spaces
+        key_hex = lines[0].split(":")[1].strip()
+        ciphertext_hex = lines[2].strip()  # Ciphertext is on line 3
+    return key_hex, ciphertext_hex
 
-# Function to decrypt the ciphertext using AES in CBC mode with PKCS7 padding
-def decrypt_aes_cbc(key_in_hex, ciphertext_in_hex):
+# Function to decrypt AES CBC with PKCS7 padding
+def decrypt_aes_cbc(key_hex, ciphertext_hex):
     # Convert the hex-encoded key and ciphertext to raw bytes
-    key = binascii.unhexlify(key_in_hex)
-    ciphertext = binascii.unhexlify(ciphertext_in_hex)
+    key = binascii.unhexlify(key_hex)
+    ciphertext = binascii.unhexlify(ciphertext_hex)
     
-    # Extract the initialization vector (IV) from the first 16 bytes of the ciphertext
+    # Extract the IV (first 16 bytes of the ciphertext)
     iv = ciphertext[:16]
     
-    # The actual encrypted data starts after the IV
-    encrypted_data = ciphertext[16:]
+    # The actual ciphertext is the remaining part after the IV
+    actual_ciphertext = ciphertext[16:]
     
-    # Create an AES cipher object in CBC mode using the key and IV
+    # Create the AES cipher object in CBC mode
     cipher = AES.new(key, AES.MODE_CBC, iv)
     
-    # Decrypt the encrypted data
-    decrypted_data = cipher.decrypt(encrypted_data)
+    # Decrypt the ciphertext
+    decrypted_data = cipher.decrypt(actual_ciphertext)
     
-    # Remove the PKCS7 padding from the decrypted data
+    # Unpad the decrypted data to remove PKCS7 padding
     plaintext = unpad(decrypted_data, AES.block_size)
     
-    # Return the plaintext as a UTF-8 encoded string
     return plaintext.decode('utf-8')
 
-# Function to write the decrypted plaintext to a file
+# Function to write the decrypted output to a file
 def write_output_file(file_path, plaintext):
     with open(file_path, 'w') as file:
         file.write(plaintext)
 
-# Main function to handle the complete decryption process
+# Main function to handle the decryption process
 def main():
     # Read the key and ciphertext from the input file
-    key_in_hex, ciphertext_in_hex = read_input_file(input_file_path)
+    key_hex, ciphertext_hex = read_input_file(input_file_path)
     
-    # Decrypt the ciphertext to get the original plaintext
-    decrypted_plaintext = decrypt_aes_cbc(key_in_hex, ciphertext_in_hex)
+    # Decrypt the ciphertext
+    decrypted_plaintext = decrypt_aes_cbc(key_hex, ciphertext_hex)
     
-    # Print the decrypted plaintext to the console
+    # Display the decrypted output to the user
     print("Decrypted Plaintext: ")
     print(decrypted_plaintext)
     
-    # Save the decrypted plaintext to the output file
+    # Write the decrypted output to a file
     write_output_file(output_file_path, decrypted_plaintext)
 
-# Run the main function if the script is executed directly
+# Execute the main function
 if __name__ == "__main__":
     main()

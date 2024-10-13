@@ -5,9 +5,9 @@ import os
 
 # Paths to the necessary files, dynamically set to work on any OS
 base_directory = os.path.dirname(os.path.abspath(__file__))
-input_file_path = os.path.join(base_directory, "task1.txt")
-encrypted_file_path = os.path.join(base_directory, "encrypted_task1.txt")
-decrypted_file_path = os.path.join(base_directory, "decrypted_task1.txt")
+input_file_path = os.path.join(base_directory, "inputs/task1.txt")
+encrypted_file_path = os.path.join(base_directory, "outputs/encrypted_task1.txt")
+decrypted_file_path = os.path.join(base_directory, "outputs/decrypted_task1.txt")
 
 # Constants for key and block sizes
 AES_KEY_SIZE = 16  # 16 bytes = 128 bits
